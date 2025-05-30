@@ -1,5 +1,7 @@
 package org.acme;
 
+
+import jakarta.annotation.security.RolesAllowed;
 import jakarta.inject.Inject;
 import jakarta.transaction.Transactional;
 import jakarta.ws.rs.*;
@@ -17,6 +19,7 @@ public class MovieResource {
     MovieRepository movieRepository;
 
     @GET
+    @RolesAllowed("admin")
     public List<Movie> getMovies() {
         return movieRepository.listAll();
     }
@@ -24,12 +27,14 @@ public class MovieResource {
     @GET
     @Path("/size")
     @Produces(MediaType.TEXT_PLAIN)
+
     public long countMovies() {
         return movieRepository.count();
     }
 
     @POST
     @Transactional
+
     public Response createMovie(Movie newMovie) {
         movieRepository.persist(newMovie);
         return Response.status(Response.Status.CREATED).entity(newMovie).build();
@@ -38,6 +43,7 @@ public class MovieResource {
     @PUT
     @Path("/{id}/{title}")
     @Transactional
+
     public Response updateMovie(@PathParam("id") Long id,
                                 @PathParam("title") String title) {
         Movie movie = movieRepository.findById(id);
@@ -51,6 +57,7 @@ public class MovieResource {
     @DELETE
     @Path("/{id}")
     @Transactional
+
     public Response deleteMovie(@PathParam("id") Long id) {
         boolean deleted = movieRepository.deleteById(id);
         if (deleted) {
@@ -59,4 +66,6 @@ public class MovieResource {
             return Response.status(Response.Status.BAD_REQUEST).build();
         }
     }
+
+
 }
